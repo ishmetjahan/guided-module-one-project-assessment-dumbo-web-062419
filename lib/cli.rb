@@ -43,10 +43,10 @@ class Interface
                 list_classrooms
             end
             menu.choice "Update a Class", -> do 
-                #update_classrooms
+                update_classrooms
             end
             menu.choice "Remove a Class", -> do
-                #remove_classrooms
+                remove_classrooms
             end
             menu.choice "Exit"
         end
@@ -85,13 +85,15 @@ class Interface
 
     def list_classrooms
         @prompt.select "For which class would you like to see a list of students?" do |menu|
-           @current_user.classrooms.each do |classroom|
+           @all_subjects = @current_user.classrooms.each do |classroom|
                 menu.choice classroom.name, -> do
                     list_students_for_classroom(classroom)
                 end
             end
+
             menu.choice "Back", -> { main_menu }
         end
+
     end
 
     def list_students_for_classroom(classroom)
@@ -109,13 +111,44 @@ class Interface
     end
 
     def update_classrooms
-        @prompt.select("Please select the class that you would like to update", @current_user.classroom_names)
-
+        new_name= @prompt.ask "Please enter a name that you would like to call your new class."
+        @prompt.select("Please select the class that you would like to update") do |menu|
+        @current_user.classroom_names.each do |subject|
+            menu.choice subject.name, -> {subject.update(name: new_name)}
+            end
+        end
+        
     end
 
     def remove_classrooms
-        binding.pry
-        @prompt.select("Please select the classroom that you would like to remove", @current_user.classroom_names) 
-       
+        @prompt.select("Please select the class that you would like to update") do |menu|
+            #all of the instances that the user created -- then loop through to find a single instance and 
+            @current_user.classroom_names.each do |subject|
+            menu.choice subject.name, -> { subject.destroy }
+            end
+        end
+
+    #     #@name_subjects is not needed, loop over 
+    #     #@current_user.classrooms for similar results
+    #     @current_user.classrooms
+    #     # ___________________NOT NEEDED_______________________________
+    #     @name_subjects = @all_subjects.map do |each_subject| 
+    #         each_subject.name
+    #     end
+    #     # __________________________________________________
+    #    selected_classroom = @prompt.select("Please select the classroom that you would like to remove") do |menu|
+    #        menu.choice "#{@name_subjects[0]}"
+    #        menu.choice "Back", -> { main_menu }
+    #     end
+    #     puts "The class #{selected_classroom} was canceled."
+    #     binding.pry  
+
     end
+
+    #  def destroy 
+    #     Teacher.classroom.map do |subject|
+    #         subject.destroy
+
+    #     end
+    #  end
 end
